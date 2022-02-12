@@ -10,4 +10,9 @@ export class PostgresService {
       return result.rows;
     });
   }
+
+  async getOne(queryText: string, values: any[] = []): Promise<any> {
+    const result = await this.executeQuery(queryText, values);
+    return result[0];
+  }
 }
