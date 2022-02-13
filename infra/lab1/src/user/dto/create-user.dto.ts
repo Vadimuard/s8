@@ -50,3 +50,25 @@ export class CreateUserDto {
   @Length(5)
   position?: string;
 }
+
+export class CreateEmployeeDto {
+  @IsNumber()
+  @Min(1)
+  userId: number;
+
+  @IsDate()
+  birthday: Date;
+
+  @IsNumber()
+  @Min(0)
+  @Max(1)
+  gender: number;
+
+  @IsNumber()
+  @Min(1000)
+  wage: number;
+
+  @IsString()
+  @Length(5)
+  position: string;
+}

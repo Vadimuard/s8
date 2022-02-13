@@ -8,9 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { isEmail, isPhoneNumber } from 'class-validator';
 
 @Controller('user')
 export class UserController {
@@ -19,6 +18,11 @@ export class UserController {
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @Post('employee')
+  createEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
+    return this.userService.createEmployee(createEmployeeDto);
   }
 
   @Patch(':id')

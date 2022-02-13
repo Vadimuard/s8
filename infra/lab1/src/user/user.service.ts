@@ -2,8 +2,9 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import { ResourceExistsException } from 'src/helpers/CustomExceptions';
 import { hashPassword } from 'src/helpers/hashPassword';
 import { PostgresService } from 'src/postgres/postgres.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PrivateUser } from './entity/user';
 
 @Injectable()
 export class UserService {
@@ -40,7 +41,15 @@ export class UserService {
         0,
       ]);
       if (isEmployee) {
-        await this.createEmployee(newUser, user.id);
+        const { birthday, gender, wage, position } = newUser;
+        const newEmployee = {
+          birthday,
+          gender,
+          wage,
+          position,
+        } as CreateEmployeeDto;
+        newEmployee.userId = user.id;
+        await this.createEmployee(newEmployee);
       }
       return user.id;
     } catch (err) {
@@ -51,17 +60,14 @@ export class UserService {
     }
   }
 
-  async createEmployee(
-    newEmployee: CreateUserDto,
-    userId: number,
-  ): Promise<number> {
+  async createEmployee(newEmployee: CreateEmployeeDto): Promise<number> {
     const qs = `INSERT INTO auto_dealer.employees
       (birthday, wage, position, gender)
       VALUES ($1, $2, $3, $4)
       RETURNING id;
     `;
     try {
-      const { birthday, wage, position, gender } = newEmployee;
+      const { userId, birthday, wage, position, gender } = newEmployee;
       const [employee] = await this.pg.executeQuery(qs, [
         birthday,
         wage,
@@ -82,13 +88,13 @@ export class UserService {
     }
   }
 
-  async getByEmail(email: string) {
+  async getByEmail(email: string): Promise<PrivateUser> {
     const qs = `SELECT * FROM auto_dealer.users WHERE email = $1;`;
     const [user] = await this.pg.executeQuery(qs, [email]);
     return user;
   }
 
-  async getByPhoneNumber(phoneNumber: string) {
+  async getByPhoneNumber(phoneNumber: string): Promise<PrivateUser> {
     const qs = `SELECT * FROM auto_dealer.users WHERE phone_number = $1;`;
     const [user] = await this.pg.executeQuery(qs, [phoneNumber]);
     return user;
