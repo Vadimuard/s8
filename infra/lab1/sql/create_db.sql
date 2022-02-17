@@ -5,7 +5,7 @@ GRANT SELECT,
   UPDATE,
   DELETE ON ALL TABLES IN SCHEMA auto_dealer TO master;
 -- create tables
-CREATE TABLE auto_dealer.manufacturers (
+CREATE TABLE auto_dealer.make (
   id SERIAL PRIMARY KEY,
   name varchar(50) NOT NULL,
   country varchar(50) NOT NULL,
@@ -18,8 +18,8 @@ CREATE TABLE auto_dealer.car_body (
 );
 CREATE TABLE auto_dealer.auto (
   id SERIAL PRIMARY KEY,
-  manufacturer_id INT NOT NULL,
-  FOREIGN KEY (manufacturer_id) REFERENCES auto_dealer.manufacturers (id),
+  make_id INT NOT NULL,
+  FOREIGN KEY (make_id) REFERENCES auto_dealer.make (id),
   model varchar(50) NOT NULL,
   body_id INT NOT NULL,
   year_released SMALLINT NOT NULL,
@@ -30,6 +30,7 @@ CREATE TABLE auto_dealer.auto (
 );
 CREATE TABLE auto_dealer.users (
   id SERIAL PRIMARY KEY,
+  username varchar(30) UNIQUE NOT NULL,
   full_name varchar(100) NOT NULL,
   phone_number varchar(14) NOT NULL,
   email varchar(255) NOT NULL,
@@ -53,4 +54,10 @@ CREATE TABLE auto_dealer.orders (
   FOREIGN KEY (seller_id) REFERENCES auto_dealer.users (id),
   created_at timestamp,
   paid_date timestamp DEFAULT NULL
+);
+CREATE TABLE auto_dealer.session (
+  id SERIAL PRIMARY KEY,
+  token text,
+  user_id INT references auto_dealer.users (id),
+  created_at timestamp
 );

@@ -13,6 +13,10 @@ import {
 
 export class CreateUserDto {
   @IsString()
+  @Length(4, 30)
+  username: string;
+
+  @IsString()
   @Length(5, 100)
   full_name: string;
 

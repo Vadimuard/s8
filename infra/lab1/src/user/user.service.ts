@@ -4,7 +4,7 @@ import { hashPassword } from 'src/helpers/hashPassword';
 import { PostgresService } from 'src/postgres/postgres.service';
 import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrivateUser } from './entity/user';
+import { PrivateUser, PublicUser } from './entity/user';
 
 @Injectable()
 export class UserService {
@@ -12,18 +12,20 @@ export class UserService {
 
   async create(newUser: CreateUserDto): Promise<number> {
     const qs = `INSERT INTO auto_dealer.users
-      (full_name, phone_number, email, password, employee_id)
-      VALUES ($1, $2, $3, $4, $5)
+      (username, full_name, phone_number, email, password, employee_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id;
     `;
     try {
-      const { email, phone_number } = newUser;
-      let existingUser = await this.getByEmail(email);
-      if (existingUser)
+      const { email, phone_number, username } = newUser;
+      if (await this.getByEmail(email))
         throw new ResourceExistsException('User with this email');
-      existingUser = await this.getByPhoneNumber(phone_number);
-      if (existingUser)
+
+      if (await this.getByPhoneNumber(phone_number))
         throw new ResourceExistsException('User with this phone number');
+
+      if (await this.getByUsername(username))
+        throw new ResourceExistsException('User with this username');
     } catch (err) {
       console.error(err);
       throw new ServiceUnavailableException(
@@ -31,9 +33,11 @@ export class UserService {
       );
     }
     try {
-      const { full_name, phone_number, email, password, isEmployee } = newUser;
+      const { username, full_name, phone_number, email, password, isEmployee } =
+        newUser;
       const passwordHash = await hashPassword(password);
       const [user] = await this.pg.executeQuery(qs, [
+        username,
         full_name,
         phone_number,
         email,
@@ -97,6 +101,12 @@ export class UserService {
   async getByPhoneNumber(phoneNumber: string): Promise<PrivateUser> {
     const qs = `SELECT * FROM auto_dealer.users WHERE phone_number = $1;`;
     const [user] = await this.pg.executeQuery(qs, [phoneNumber]);
+    return user;
+  }
+
+  async getByUsername(username: string): Promise<PublicUser> {
+    const qs = `SELECT * FROM auto_dealer.users WHERE username = $1`;
+    const [user] = await this.pg.executeQuery(qs, [username]);
     return user;
   }
 
