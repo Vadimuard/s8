@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { validatePassword } from 'src/helpers/hashPassword';
-import { createSessionToken } from 'src/helpers/sessionHelper';
-import { PostgresService } from 'src/postgres/postgres.service';
-import { UserService } from 'src/user/user.service';
+import { validatePassword } from '../helpers/hashPassword';
+import { createSessionToken } from '../helpers/sessionHelper';
+import { PostgresService } from '../postgres/postgres.service';
+import { UserService } from '../user/user.service';
 import { EmailLoginDto, PhoneNumberLoginDto } from './dto/create-auth.dto';
 import { Session } from './entities/auth.entity';
 

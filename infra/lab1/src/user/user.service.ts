@@ -1,7 +1,7 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
-import { ResourceExistsException } from 'src/helpers/CustomExceptions';
-import { hashPassword } from 'src/helpers/hashPassword';
-import { PostgresService } from 'src/postgres/postgres.service';
+import { ResourceExistsException } from '../helpers/CustomExceptions';
+import { hashPassword } from '../helpers/hashPassword';
+import { PostgresService } from '../postgres/postgres.service';
 import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrivateUser, PublicUser } from './entity/user';
