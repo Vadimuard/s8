@@ -5,6 +5,25 @@ export class ViewsController {
   @Get()
   @Render('index')
   root() {
-    return { message: 'Hello world!' };
+    return {
+      autos: [
+        { title: 'Title1', img: '' },
+        { title: 'Title2', img: '' },
+        { title: 'Title3', img: '' },
+        { title: 'Title4', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+        { title: 'Title5', img: '' },
+      ],
+    };
   }
 }
