@@ -1,14 +1,21 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ResourceExistsException } from '../helpers/CustomExceptions';
 import { hashPassword } from '../helpers/hashPassword';
 import { PostgresService } from '../postgres/postgres.service';
 import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrivateUser, PublicUser } from './entity/user';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
-  constructor(private pg: PostgresService) {}
+  constructor(
+    private pg: PostgresService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
   async create(newUser: CreateUserDto): Promise<number> {
     const qs = `INSERT INTO auto_dealer.users
@@ -116,5 +123,9 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
+  }
+
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 }

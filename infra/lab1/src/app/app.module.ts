@@ -7,6 +7,7 @@ import { ViewsModule } from '../views/views.module';
 import postgresConfig from '../config/postgres.config';
 import { PostgresModule } from '../postgres/postgres.module';
 import { AppService } from './app.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AppService } from './app.service';
       envFilePath: ['.env'],
       load: [postgresConfig],
     }),
+    TypeOrmModule.forRoot(),
     PostgresModule,
     ViewsModule,
     AutoModule,
