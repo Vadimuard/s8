@@ -1,34 +1,32 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
   Param,
   Delete,
+  Get,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateEmployeeDto, CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { BearerAuthGuard } from '../auth/guards/http-bearer.guard';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+
+  @Get(':id')
+  @UseGuards(BearerAuthGuard)
+  getOne(@Param('id') id: number) {
+    return this.userService.findById(id);
   }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-
-  @Post('employee')
-  createEmployee(@Body() createEmployeeDto: CreateEmployeeDto) {
-    return this.userService.createEmployee(createEmployeeDto);
-  }
-
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);

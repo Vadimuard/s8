@@ -1,28 +1,26 @@
-import {
-  IsString,
-  Length,
-  IsPhoneNumber,
-  IsEmail,
-  IsBoolean,
-  IsNumber,
-  Min,
-  Max,
-  IsDate,
-  ValidateIf,
-} from 'class-validator';
+import { IsString, Length, IsPhoneNumber, IsEmail } from 'class-validator';
+import { User } from '../entities/user.entity';
 
 export class CreateUserDto {
-  @IsString()
-  @Length(4, 30)
-  username: string;
+  constructor(
+    fullname: string,
+    phoneNumber: string,
+    email: string,
+    password: string,
+  ) {
+    this.fullName = fullname;
+    this.phoneNumber = phoneNumber;
+    this.email = email;
+    this.password = password;
+  }
 
   @IsString()
   @Length(5, 100)
-  full_name: string;
+  fullName: string;
 
   @Length(10, 14)
-  @IsPhoneNumber('UA')
-  phone_number: string;
+  @IsPhoneNumber()
+  phoneNumber: string;
 
   @IsEmail()
   email: string;
@@ -31,48 +29,12 @@ export class CreateUserDto {
   @Length(8, 40)
   password: string;
 
-  @IsBoolean()
-  isEmployee: boolean;
-
-  @ValidateIf((o) => o.isEmployee)
-  @IsDate()
-  birthday?: Date;
-
-  @ValidateIf((o) => o.isEmployee)
-  @IsNumber()
-  @Min(0)
-  @Max(1)
-  gender?: number;
-
-  @ValidateIf((o) => o.isEmployee)
-  @IsNumber()
-  @Min(1000)
-  wage?: number;
-
-  @ValidateIf((o) => o.isEmployee)
-  @IsString()
-  @Length(5)
-  position?: string;
-}
-
-export class CreateEmployeeDto {
-  @IsNumber()
-  @Min(1)
-  userId: number;
-
-  @IsDate()
-  birthday: Date;
-
-  @IsNumber()
-  @Min(0)
-  @Max(1)
-  gender: number;
-
-  @IsNumber()
-  @Min(1000)
-  wage: number;
-
-  @IsString()
-  @Length(5)
-  position: string;
+  static toUser(createUserDto: CreateUserDto): User {
+    const user = new User();
+    user.email = createUserDto.email;
+    user.phoneNumber = createUserDto.phoneNumber;
+    user.fullName = createUserDto.fullName;
+    user.password = createUserDto.password;
+    return user;
+  }
 }

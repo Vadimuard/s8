@@ -15,9 +15,6 @@ export class Auto {
   @Column({ default: '', length: 50 })
   VIN: string;
 
-  @Column({ nullable: false })
-  price: number;
-
   @Column('smallint', { default: 0 })
   horsePower: number;
 

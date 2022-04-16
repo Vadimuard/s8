@@ -1,47 +1,49 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { validatePassword } from '../helpers/hashPassword';
 import { createSessionToken } from '../helpers/sessionHelper';
-import { PostgresService } from '../postgres/postgres.service';
+import { PublicUser } from '../user/entities/publicUser.entity';
 import { UserService } from '../user/user.service';
-import { EmailLoginDto, PhoneNumberLoginDto } from './dto/create-auth.dto';
-import { Session } from './entities/auth.entity';
+import { Session } from './entities/session.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService, private pg: PostgresService) {}
+  constructor(
+    @InjectRepository(Session)
+    private sessionRepository: Repository<Session>,
+    private userService: UserService,
+  ) {}
+
+  async validateUser(email: string, password: string): Promise<PublicUser> {
+    const user = await this.userService.findOne(email);
+    if (!user || !(await validatePassword(password, user.password))) {
+      return null;
+    }
+    return user.toPublic();
+  }
+
+  async validateSession(token: string): Promise<number> {
+    const session = await this.sessionRepository
+      .createQueryBuilder('session')
+      .select('session.user_id', 'userId')
+      .where(
+        "session.token = :token AND created_at < NOW() + INTERVAL '3 DAY'",
+        { token },
+      )
+      .getRawOne();
+    if (!session) return 0;
+    return session.userId;
+  }
 
   async createSession(userId: number): Promise<string> {
     const { token, hashedToken } = await createSessionToken();
-    const qs = `INSERT INTO auto_dealer.session (token, user_id) VALUES ($1, $2)`;
-    await this.pg.executeQuery(qs, [hashedToken, userId]);
+
+    this.sessionRepository.save({
+      token: hashedToken,
+      userId: userId,
+    });
+
     return token as string;
-  }
-
-  async logInWithEmail(credentials: EmailLoginDto): Promise<string> {
-    const user = await this.userService.getByEmail(credentials.email);
-    if (!user) throw new UnauthorizedException();
-    if (await validatePassword(credentials.password, user.password)) {
-      return await this.createSession(user.user_id);
-    }
-    return null;
-  }
-
-  async logInWithPhoneNumber(
-    credentials: PhoneNumberLoginDto,
-  ): Promise<string> {
-    const user = await this.userService.getByPhoneNumber(
-      credentials.phone_number,
-    );
-    if (!user) throw new UnauthorizedException();
-    if (await validatePassword(credentials.password, user.password)) {
-      return await this.createSession(user.user_id);
-    }
-    return null;
-  }
-
-  async getSessionByToken(token: string): Promise<Session> {
-    const qs = `SELECT user_id FROM auto_dealer.session WHERE token = $1`;
-    const [session] = await this.pg.executeQuery(qs, [token]);
-    return session;
   }
 }

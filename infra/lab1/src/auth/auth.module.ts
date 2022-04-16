@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
-import { PostgresModule } from '../postgres/postgres.module';
+import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '../user/user.module';
+import { AuthService } from './auth.service';
+import { HttpBearerStrategy } from './http-bearer.strategy';
+import { AuthController } from './auth.controller';
+import { Session } from './entities/session.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [UserModule, PostgresModule],
+  imports: [UserModule, PassportModule, TypeOrmModule.forFeature([Session])],
+  providers: [AuthService, HttpBearerStrategy],
   controllers: [AuthController],
-  providers: [AuthService],
 })
 export class AuthModule {}

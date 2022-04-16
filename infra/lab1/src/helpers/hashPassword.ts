@@ -2,7 +2,7 @@
 
 import * as crypto from 'crypto';
 
-const serializeHash = (hash: Buffer, salt: Buffer, params) => {
+const serializeHash = (hash: Buffer, salt: Buffer, params): string => {
   const paramString = Object.entries(params)
     .map(([key, value]) => `${key}=${value}`)
     .join(',');
@@ -37,7 +37,7 @@ const SCRYPT_PARAMS = {
   maxmem: 64 * 1024 * 1024,
 };
 
-const hashPassword = (password: string) =>
+const hashPassword = (password: string): Promise<string> =>
   new Promise((resolve, reject) => {
     crypto.randomBytes(SALT_LEN, (err, salt) => {
       if (err) {
