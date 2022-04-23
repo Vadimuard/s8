@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "quotes": [2, "single", "avoid-escape"]
+  },
+  "root": true,
+  "extends": [
+    "plugin:vue/essential"
+    // "plugin:prettier/recommended",
+    // "eslint:recommended"
+  ]
+}
